@@ -1,60 +1,49 @@
 package org.example.l1.hw1;
 
-import java.util.HashSet;
 import java.util.Scanner;
 import java.util.Set;
 
-/*
-    distance between trees - 1 meter
-    start position for vasya and masha locked
-
-    Task 1 How many trees can you paint?
-===========
-    vasya parameters
-    tree number - P,
-    distance to paint dries - V
-    ===========
-    masha parameters
-    tree number - Q
-    distance to paint dries - M
-===========
-===========
-       (-max)-P -P -2 -1 |0|  1  2 Q Q+M(max)
-===========
-===========
-===========
-1 000 000 00 = 10^8 - maxlength
-*/
 public class Task1 {
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
-//        int p = sc.nextInt(); //start 1
-//        int v = sc.nextInt(); //length 1
-//        int q = sc.nextInt(); //start 2
-//        int m = sc.nextInt(); //length 2
-        int p = 0;
-        int v = 7;
-        int q = 12;
-        int m = 5;
+        int p = sc.nextInt(); //start 1
+        int v = sc.nextInt(); //length 1
+        int q = sc.nextInt(); //start 2
+        int m = sc.nextInt(); //length 2
         int result = paintedTree(p, v, q, m);
         System.out.println(result);
     }
 
-    private static int paintedTree(int pStart, int vDistance,
-                                   int qStart, int mDistance) {
+    static int paintedTree(int pStart, int vDistance,
+                           int qStart, int mDistance) {
+        //стартуют в одном месте
         if (pStart == qStart) {
-            return (Math.abs(vDistance) > Math.abs(mDistance) ?
-                    Math.abs(vDistance) * 2 :
-                    Math.abs(mDistance) * 2) + 1;
+            return (vDistance > mDistance ?
+                    vDistance * 2 + 1 :
+                    mDistance * 2 + 1);
         }
-        Set<Integer> result = new HashSet<>();
-        fillSet(result, pStart, vDistance);
-        fillSet(result, qStart, mDistance);
-        return result.size();
+
+        //Один отрезок полностью в другом
+        boolean pLeft = (pStart - vDistance) < (qStart - mDistance);
+        int x1 = pLeft ? pStart - vDistance : qStart - mDistance;
+        int x2 = pLeft ? pStart + vDistance : qStart + mDistance;
+
+        int y1 = pLeft ? qStart - mDistance : pStart - vDistance;
+        int y2 = pLeft ? qStart + mDistance : pStart + vDistance;
+        int result = 0;
+        //два не пересекающихся отрезка
+        if (x2 < y1) {
+            result = (mDistance * 2 + 1) + (vDistance * 2 + 1);
+            return result;
+        }
+
+        int mincoord = Math.min(Math.min(x1, y1), Math.min(x2, y2));
+        int maxcoord = Math.max(Math.min(x1, y1), Math.max(x2, y2));
+        return (0 - mincoord) + maxcoord + 1;
     }
 
     static Set<Integer> fillSet(Set<Integer> inputSet, int Start, int step) {
-        for (int i = Start - step; i <= Start + step; i++) {
+        for (int i = Start; i <= step; i++) {
             inputSet.add(i);
         }
         return inputSet;
